@@ -1,0 +1,208 @@
+ECHO is on.
+
+• Docker is a virtualization software that makes developing and deploying applications much easier.
+    - packages application with all necessary dependencies, configuration system tools, and runtime.
+
+as
+
+• Container : - A standardized unit, that has everything the application needs to run.
+			     (portable artifact,easily shared and distributed)
+
+▸Problems on development and deploying solved by .........
+
+		- Developers creates an application packages as artifact includes everything that an app needs(configurations,app source code,dependencies).
+		  Instead of textual everything is packed inside Docker Artifact.
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+# Virtual Machine vs Docker 
+	
+→ How OS is made ??
+
+	----------------------	 OS Application Layer ----------------------
+	---------------------- 	       OS Kernel 	      ----------------------
+	---------------------- 	       Hardware 	      ----------------------
+
+– Kernel is the core of every operating system. Kernel interacts between hardware & Software components.
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+→ So difference btw VM & Docker is : - 
+
+• Docker contains or virtualize only first layer ie..,Os Application Layer . Services and apps are installed on top of that layer.
+(It does not have it's own OS Kernel)
+
+• As opposite in case of Virtual Machine as its virtualizes both the layers (ie.., OS Application Layer and it's own Kernel).
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+* What affects has this difference? 
+
+▸ Docker images are much smaller.
+
+▸Containers takes less time to run as compare to VMs.
+
+▸Compatibility : - • VM is compatible with all OS.
+				 • Docker is compatible only with Linux distros.(ie.., Linux based Docker images cannot use Windows kernel).
+				 -  Just to solve this problem *Docker Desktop* was introduced which allows you to run Linux containers on Windows or Macos.
+				 (It Uses a Hypervisor layer with a lightweight Linux distro).
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+→ Difference btw  ' Docker image ' vs ' Docker Containers '
+
+•Docker Image : - 
+			▸Docker image is just like a zip file or tarfile or jar File known as 'Artifact Repository'.
+			▸An executable application artifact. Includes app source code but also complete environment configuration.
+			▸Immutable template that defines how a container will be realized.
+
+•Docker Container : - 
+			▸Actually starts the application.
+			▸A running instance of an image.
+
+→ ' You can run multiple containers from 1 image. ' ←	
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+# Docker Registries : - ( public and private docker registries )
+
+— A storage and distribution system for Docker images.
+— Official images available from applications like Redis, Mongo, Postgres etc.
+— Official images are maintained by the software authors or collaboration with Docker Community.
+— Docker hosts one of the biggest Docker Registry called "Docker Hub".
+
+(Docker Hub is a registry. On Docker Hub you can host private or public repositories for your applications.)
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# PORT BINDING : - 
+	- ( Bind the container's port to the host's port to make the service available to the outside world ).
+
+▸Container Port vs Host Port : - 
+— Application inside container runs in an isolated Docker network.( This allows us to run the same app running on same port multiple times ).
+— We need to first expose the container port to the host ( the machine where container runs on ).
+
+• docker run -d -p <port_on_host> <port_on_container> Container_name
+    eg : - ( docker run -d -p 8080:80 ngnix )
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+# DockerFile : - Create own Images. ( → Used to create custom image ).
+
+▸We want to deploy our app as a Docker Container ?!!
+
+→ We need to create a " definition " of how to build an image from our application....like,
+
+	( Dockerfile -> (build) -> Image -> (run) -> container. )
+
+- Dockerfile is a text document that contains commands to assemble an image.
+- Docker can then build an image by reading those instructions.
+
+( We can write a Dockerfile for Node.js application. Then, build a Docker image from it. )
+
+*************	Structure OF Dockerfile	******************
+
+▸Docker image start from a parent image or " base image ".
+▸It's a Docker image that your image is based on.
+
+	( You choose the base image, depending on which tools you need to have available )
+	  ..like for ( [ javascript we would have node],[java -> tomcat],[python -> python ] )
+
+# Dockerfile ( structure ) : - 
+
+FROM node:19-alpine
+
+COPY package.json/app/
+COPY src/app/
+
+WORKDIR /app			// WORKDIR is same as "cd"(change directory)
+
+RUN npm install
+
+CMD ["node","server.js"]
+
+( This is a complete Dockerfile which will create Image for our node.js application...which we can then start as a container. )
+
+------------------------------- Now we need to actually build the Docker image from it ---------------------------------------------------
+
+							 Dockerfile -> ( build ) -> Image 
+
+• docker build -t node-app:1.0 .	// ( . )  Dot means current working directory
+								// -t or --tag	= Sets a name and optionally a tag in the "name:tag" format
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+# Docker Volume : - 
+
+Q. why we need it..?!
+
+→   So when you create a Docker container it gets a memory which is temporary memory ( ie.., if we created some database in container and perform some operations if ,                      	Container stops then that database storage will also get deleted/removed .....So Docker Volumes are imp ).
+
+• Docker Volumes are permanent storage which we can bind with our container so that our container can get permanent storage. 
+• Docker volumes are file systems that are mounted on Docker containers to preserve the data generated by the container.
+
+eg : - (Let's create a folder on our machine inside which their will be some code and that code we will mount with docker )
+
+steps : - 
+• Suppose we created an app folder on our desktop inside which we created one index.js which simply gives ouput as " Hello world from mayur!" .
+   And we have to mount this folder app with our docker 
+
+command : - docker run -it -v <address of our folder>:<address of container to be mounted with > node bash
+
+	       eg:- (docker run -it -v C:/Users/mayur/Desktop/app:/home/app node bash )
+
+
+▸( Full code commands : -
+
+cd desktop
+mkdir app
+code app
+docker run -it node:latest
+docker ps -a or docker container ls -a
+docker run -it -v C:/Users/MAYUR/Desktop/app:/home/app node bash
+
+[ now from here we are inside node bash ......like root@07f776085f1a something ]
+ ls
+ cd home/
+ cd app/
+ls
+cat index.js
+) 
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+# Docker Compose : - 
+
+By using Docker compose we can run multiple container by giving configuration in a single file..
+
+• Compose simplifies the control of your entire application stack, making it easy to manage services, networks, and volumes in a single, comprehensible YAML  	configuration file. Then, with a single command, you create and start all the services from your configuration file.
+
+• Docker Compose allows you to define and manage multi-container applications in a single YAML file. This simplifies the complex task of orchestrating and coordinating various services, making it easier to manage and replicate your application environment.
+
+- The Compose file provides a way to document and configure all of the application's service dependencies (databases, queues, caches, web service APIs, etc). Using the   	Compose command line tool you can create and start one or more containers for each dependency with a single command (docker compose up).
+
+# Commands : - 
+
+( In terminal ) : - 
+
+ docker compose up -d
+ ./run_tests
+ docker compose down
+
+eg : - 
+(
+
+▸Create a file called compose.yaml in your project directory and paste the following:
+
+services:
+  web:
+    build: .
+    ports:
+      - "8000:5000"
+  redis:
+    image: "redis:alpine"
+
+• This Compose file defines two services: web and redis.
+
+- The web service uses an image that's built from the Dockerfile in the current directory. It then binds the container and the host machine to the exposed port, 8000. This    	example service uses the default port for the Flask web server, 5000.
+- The redis service uses a public Redis image pulled from the Docker Hub registry.
+
+)

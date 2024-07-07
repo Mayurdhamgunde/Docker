@@ -1,0 +1,22 @@
+version: "3.8" 
+name: docker tut 
+services:
+  nodeapp:
+    image: <name of the image>
+    container_name: <name of the container>
+    environment:
+      - PORT=4000
+      - MONGO_URI=mongodb://admin:password@mongodb
+    ports:
+      - 4000:4000
+    depends_on:
+      - mongodb
+
+  mongodb: 
+    image: mongo
+    container_name: docker_tutDB
+    ports:
+      - 27070:27017
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME: admin
+      - MONGO_INITDB_ROOT_PASSWORD: password
